@@ -6,13 +6,13 @@ import {
   FlatList,
   Image,
   useWindowDimensions,
-  TextInput
+  TextInput,
+  TouchableOpacity,
 } from "react-native";
-import { SafeAreaView, Platform } from 'react-native';
-
+import { SafeAreaView, Platform } from "react-native";
 
 export const SearchBar = ({ navigation }) => {
-  const [text, setText] = useState('');
+  const [text, setText] = useState("");
   const [pokemons, setPokemons] = useState([]);
   const [filteredPokemons, setFilteredPokemons] = useState([]);
   const window = useWindowDimensions(); // récupère la largeur de l'écran
@@ -23,12 +23,17 @@ export const SearchBar = ({ navigation }) => {
   const SPACING = ITEM_WIDTH; // on veut un espace égal à la largeur d’un bloc
 
   // Calcul dynamique du nombre de colonnes selon la taille de l'écran
-  const numColumns = Math.max(1, Math.floor(window.width / (ITEM_WIDTH + SPACING)));
+  const numColumns = Math.max(
+    1,
+    Math.floor(window.width / (ITEM_WIDTH + SPACING))
+  );
 
   useEffect(() => {
     const fetchPokemons = async () => {
       try {
-        const response = await fetch("https://tyradex.vercel.app/api/v1/pokemon");
+        const response = await fetch(
+          "https://tyradex.vercel.app/api/v1/pokemon"
+        );
         if (!response.ok) {
           throw new Error("Network response was not ok");
         }
@@ -47,97 +52,65 @@ export const SearchBar = ({ navigation }) => {
   }, []);
 
   useEffect(() => {
-  if (text.length > 2) {
-    const results = pokemons.filter((pokemon) => pokemon.name.fr.toLowerCase().includes(text.toLowerCase()));
-    setFilteredPokemons(results);
-  } 
-  else {
-    setFilteredPokemons([]);
-  }
-}, [text,pokemons]);
+    if (text.length > 2) {
+      const results = pokemons.filter((pokemon) =>
+        pokemon.name.fr.toLowerCase().includes(text.toLowerCase())
+      );
+      setFilteredPokemons(results);
+    } else {
+      setFilteredPokemons([]);
+    }
+  }, [text, pokemons]);
 
-const dataToDisplay = text.length > 2 ? filteredPokemons : pokemons;
+  const dataToDisplay = text.length > 2 ? filteredPokemons : pokemons;
 
   return (
-    <>
-    {isMobile ? (
-      <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
     <View style={styles.container}>
-      <TextInput 
+      <TextInput
         style={styles.searchbar}
         placeholder="Rechercher un Pokemon"
         onChangeText={setText}
-        value={text} />
+        value={text}
+      />
 
       <FlatList
         data={dataToDisplay}
         numColumns={numColumns}
-        columnWrapperStyle={
-          numColumns > 1 ? styles.columnWrapper : null
-        } // ajoute de l'espacement horizontal
-        contentContainerStyle={styles.listContent}
-
-        renderItem={({ item }) => (
-          <View style={[styles.itemContainer, { width: ITEM_WIDTH }]}>
-            <Image
-              source={{ uri: item?.sprites?.regular }}
-              style={styles.image}
-            />
-            <Text style={styles.itemText}>
-              {item?.name?.fr ?? "Nom inconnu"}
-            </Text>
-          </View>
-        )}
-
-      />
-    </View>
-    </SafeAreaView>
-  ) : (
-
-    <View style={styles.container}>
-      <TextInput 
-        style={styles.searchbar}
-        placeholder="Rechercher un Pokemon"
-        onChangeText={setText}
-        value={text} />
-
-      <FlatList
-        data={dataToDisplay}
-        numColumns={numColumns}
-        columnWrapperStyle={
-          numColumns > 1 ? styles.columnWrapper : null
-        } // ajoute de l'espacement horizontal
+        columnWrapperStyle={numColumns > 1 ? styles.columnWrapper : null} // ajoute de l'espacement horizontal
         contentContainerStyle={styles.listContent}
         renderItem={({ item }) => (
-          
           <View style={[styles.itemContainer, { width: ITEM_WIDTH }]}>
-            <Image
-              source={{ uri: item?.sprites?.regular }}
-              style={styles.image}
-            />
-            <Text style={styles.itemText}>
-              {item?.name?.fr ?? "Nom inconnu"}
-            </Text>
+            <TouchableOpacity
+              onPress={() =>
+                navigation.navigate("Pokemon", {
+                  pokedexId: item.pokedexId || item.pokedex_id,
+                })
+              }
+            >
+              <Image
+                source={{ uri: item?.sprites?.regular }}
+                style={styles.image}
+              />
+              <Text style={styles.itemText}>
+                {item?.name?.fr ?? "Nom inconnu"}
+              </Text>
+            </TouchableOpacity>
           </View>
         )}
-
       />
     </View>
-  )}
-</>
-)
-}
+  );
+};
 
 // Styles
 const styles = StyleSheet.create({
-
   searchbar: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderRadius: 8,
     paddingVertical: 10,
     paddingHorizontal: 15,
     fontSize: 16,
-    borderColor: '#ddd',
+    borderColor: "#ddd",
     borderWidth: 1,
     marginHorizontal: 10,
     marginBottom: 15,
@@ -146,7 +119,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.05,
     shadowOffset: { width: 0, height: 2 },
     shadowRadius: 4,
-  },  
+  },
   container: {
     flex: 1,
     paddingTop: 20,

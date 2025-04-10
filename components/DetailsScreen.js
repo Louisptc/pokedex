@@ -1,10 +1,10 @@
 import { StyleSheet, Text, View, FlatList } from 'react-native';
 import { SearchBar } from './searchbar';
 
-export function HomeScreen({navigation}) {
+export function DetailsScreen({navigation}) {
   return (
     <View style={styles.container}>
-      <SearchBar navigation={navigation} />
+      hello
     </View>
   );
 }
