@@ -31,7 +31,6 @@ export const SearchBar = ({ navigation }) => {
     <View style={styles.container}>
       <FlatList
         data={pokemons}
-        keyExtractor={(item, index) => index.toString()} // clé unique pour chaque item
         renderItem={({ item }) => (
           <View style={styles.itemContainer}>
             <Text style={styles.itemText}>
