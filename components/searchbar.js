@@ -8,12 +8,15 @@ import {
   useWindowDimensions,
   TextInput
 } from "react-native";
+import { SafeAreaView, Platform } from 'react-native';
+
 
 export const SearchBar = ({ navigation }) => {
   const [text, setText] = useState('');
   const [pokemons, setPokemons] = useState([]);
   const [filteredPokemons, setFilteredPokemons] = useState([]);
   const window = useWindowDimensions(); // récupère la largeur de l'écran
+  const isMobile = window.width < 768;
 
   // Définir la taille d’un bloc (carte Pokémon)
   const ITEM_WIDTH = 160; // en px
@@ -56,12 +59,16 @@ export const SearchBar = ({ navigation }) => {
 const dataToDisplay = text.length > 2 ? filteredPokemons : pokemons;
 
   return (
+    <>
+    {isMobile ? (
+      <SafeAreaView style={{ flex: 1, backgroundColor: '#fff' }}>
     <View style={styles.container}>
       <TextInput 
         style={styles.searchbar}
         placeholder="Rechercher un Pokemon"
         onChangeText={setText}
         value={text} />
+
       <FlatList
         data={dataToDisplay}
         numColumns={numColumns}
@@ -69,6 +76,7 @@ const dataToDisplay = text.length > 2 ? filteredPokemons : pokemons;
           numColumns > 1 ? styles.columnWrapper : null
         } // ajoute de l'espacement horizontal
         contentContainerStyle={styles.listContent}
+
         renderItem={({ item }) => (
           <View style={[styles.itemContainer, { width: ITEM_WIDTH }]}>
             <Image
@@ -80,10 +88,45 @@ const dataToDisplay = text.length > 2 ? filteredPokemons : pokemons;
             </Text>
           </View>
         )}
+
       />
     </View>
-  );
-};
+    </SafeAreaView>
+  ) : (
+
+    <View style={styles.container}>
+      <TextInput 
+        style={styles.searchbar}
+        placeholder="Rechercher un Pokemon"
+        onChangeText={setText}
+        value={text} />
+
+      <FlatList
+        data={dataToDisplay}
+        numColumns={numColumns}
+        columnWrapperStyle={
+          numColumns > 1 ? styles.columnWrapper : null
+        } // ajoute de l'espacement horizontal
+        contentContainerStyle={styles.listContent}
+        renderItem={({ item }) => (
+          
+          <View style={[styles.itemContainer, { width: ITEM_WIDTH }]}>
+            <Image
+              source={{ uri: item?.sprites?.regular }}
+              style={styles.image}
+            />
+            <Text style={styles.itemText}>
+              {item?.name?.fr ?? "Nom inconnu"}
+            </Text>
+          </View>
+        )}
+
+      />
+    </View>
+  )}
+</>
+)
+}
 
 // Styles
 const styles = StyleSheet.create({
@@ -106,7 +149,6 @@ const styles = StyleSheet.create({
   },  
   container: {
     flex: 1,
-    backgroundColor: "#f0f4f7",
     paddingTop: 20,
   },
   listContent: {
@@ -118,7 +160,6 @@ const styles = StyleSheet.create({
   },
   itemContainer: {
     margin: 15,
-    backgroundColor: "#ffffff",
     borderRadius: 8,
     padding: 15,
     borderColor: "#ddd",
