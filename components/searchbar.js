@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { StyleSheet, Text, View, FlatList } from 'react-native';
+import { StyleSheet, Text, View, FlatList,Image } from 'react-native';
 
 export const SearchBar = ({ navigation }) => {
   const [text, setText] = useState('');
@@ -33,6 +33,9 @@ export const SearchBar = ({ navigation }) => {
         data={pokemons}
         renderItem={({ item }) => (
           <View style={styles.itemContainer}>
+            <Image source = {{uri: item?.sprites?.regular }}
+            style={styles.image} ></Image>
+
             <Text style={styles.itemText}>
               {item?.name?.fr ?? "Nom inconnu"}
             </Text>
@@ -69,4 +72,10 @@ const styles = StyleSheet.create({
     color: '#333',
     fontWeight: '500',
   },
+  image: {
+    width: 120,
+    height: 120,
+    resizeMode: "contain",
+    alignSelf:"center"
+  }
 });
